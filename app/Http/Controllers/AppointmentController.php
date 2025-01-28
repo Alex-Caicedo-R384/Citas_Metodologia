@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -23,5 +22,13 @@ class AppointmentController extends Controller
 
         return back()->with('status', 'Appointment successfully scheduled!');
     }
-}
 
+    public function destroy(Appointment $appointment)
+    {
+        // Eliminar la cita sin verificar el propietario
+        $appointment->delete();
+    
+        return back()->with('status', 'Appointment successfully deleted!');
+    }
+    
+}

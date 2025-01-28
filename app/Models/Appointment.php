@@ -10,12 +10,13 @@ class Appointment extends Model
 
     public function user()
     {
-        return $this->belongsTo(App\Models\User::class, 'user_id');
+        // Cambiar el namespace incorrecto
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function partner()
     {
-        return $this->belongsTo(App\Models\User::class, 'partner_id');
+        // Cambiar el namespace incorrecto
+        return $this->belongsTo(User::class, 'partner_id');
     }
 }
-

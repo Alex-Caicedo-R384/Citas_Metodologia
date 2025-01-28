@@ -7,7 +7,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             <!-- Notificaciones de citas -->
             <div class="mb-6">
                 <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">{{ __('Your Appointments') }}</h3>
@@ -32,7 +31,6 @@
                     <p class="text-gray-500">{{ __('No appointments yet.') }}</p>
                 @endif
             </div>
-
 
             <!-- Filtros y usuarios -->
             <div class="mb-6">
@@ -77,6 +75,12 @@
                                 <input type="hidden" name="partner_id" value="{{ $user->id }}">
                                 <x-text-input type="date" name="date" class="block w-full" required />
                                 <x-primary-button class="bg-green-600 mt-2">{{ __('Schedule Appointment') }}</x-primary-button>
+                            </form>
+
+                            <!-- Formulario para abrir un chat con el usuario -->
+                            <form method="GET" action="{{ route('chat.create', $user->id) }}">
+                                @csrf
+                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md mt-4">Open Chat</button>
                             </form>
                         </div>
                     @endforeach

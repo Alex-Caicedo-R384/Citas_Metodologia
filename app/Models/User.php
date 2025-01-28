@@ -62,4 +62,8 @@ class User extends Authenticatable
         return $this->hasMany(App\Models\Appointment, 'partner_id');
     }
 
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

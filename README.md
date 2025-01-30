@@ -1,66 +1,188 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Autor
+Este proyecto fue desarrollado por Alex Caicedo Ramos. Puedes contactarlo a través de su correo electrónico: chevyagcr@gmail.com.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Refactorización de Aplicación Laravel: SOLID y Patrones de Diseño
 
-## About Laravel
+Este proyecto demuestra múltiples técnicas de refactorización en una aplicación Laravel, aplicando principios SOLID y patrones de diseño para mejorar la calidad del código.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Refactorizaciones Implementadas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Principios SOLID en módulo de citas**
+   - SRP (Principio de Responsabilidad Única)
+   - DIP (Principio de Inversión de Dependencias)
+   
+2. **Patrones de Diseño en módulo de chat**
+   - Factory Pattern (Patrón Fábrica)
+   - Command Pattern (Patrón Comando)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 1. Refactorización de Módulo de Citas (SOLID)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1.1 Principio de Responsabilidad Única (SRP)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+#### Implementación:
+- **Form Request para validaciones**  
+  `StoreAppointmentRequest` maneja reglas de validación
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+  ```php
+  // app/Http/Requests/StoreAppointmentRequest.php
+  public function rules() {
+      return [
+          'partner_id' => ['required', 'exists:users,id'],
+          'date' => ['required', 'date']
+      ];
+  }
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Servicio para lógica de negocio**  
+  `AppointmentService` centraliza operaciones
 
-### Premium Partners
+  ```php
+  // app/Services/AppointmentService.php
+  public function createAppointment($validatedData) {
+      return $this->appointmentRepository->create([
+          'user_id' => Auth::id(),
+          'partner_id' => $validatedData['partner_id'],
+          'date' => $validatedData['date']
+      ]);
+  }
+  ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 1.2 Principio de Inversión de Dependencias (DIP)
 
-## Contributing
+#### Implementación:
+- **Capa de Repositorio Abstracta**
+  ```php
+  // app/Repositories/AppointmentRepositoryInterface.php
+  interface AppointmentRepositoryInterface {
+      public function create(array $data): Appointment;
+      public function delete(Appointment $appointment): void;
+  }
+  ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Implementación Concreta (Eloquent)**
+  ```php
+  // app/Repositories/EloquentAppointmentRepository.php
+  class EloquentAppointmentRepository implements AppointmentRepositoryInterface {
+      public function create(array $data): Appointment {
+          return Appointment::create($data);
+      }
+  }
+  ```
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 2. Refactorización de Módulo de Chat (Patrones de Diseño)
 
-## Security Vulnerabilities
+### 2.1 Patrón Fábrica (Factory Pattern)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### Implementación:
+- **Interfaz de Fábrica**
+  ```php
+  // app/Factories/ChatFactoryInterface.php
+  interface ChatFactoryInterface {
+      public function createChat($userId): Chat;
+  }
+  ```
 
-## License
+- **Fábrica para Chats de 2 Usuarios**
+  ```php
+  // app/Factories/TwoUserChatFactory.php
+  class TwoUserChatFactory implements ChatFactoryInterface {
+      public function createChat($userId): Chat {
+          // Lógica para crear/obtener chat
+      }
+  }
+  ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 2.2 Patrón Comando (Command Pattern)
+
+#### Implementación:
+- **Clase Comando para Envío de Mensajes**
+  ```php
+  // app/Commands/SendMessageCommand.php
+  class SendMessageCommand {
+      public function execute() {
+          return Message::create([
+              'chat_id' => $this->chatId,
+              'user_id' => Auth::id(),
+              'content' => $this->messageContent
+          ]);
+      }
+  }
+  ```
+
+- **Uso en Controlador**
+  ```php
+  // app/Http/Controllers/ChatController.php
+  public function sendMessage(Request $request, $chatId) {
+      $command = new SendMessageCommand($chatId, $request->message);
+      $command->execute();
+      return back();
+  }
+  ```
+
+---
+
+## 🗂 Estructura del Proyecto Unificada
+```
+app/
+├── Commands/
+│   └── SendMessageCommand.php
+├── Factories/
+│   ├── ChatFactoryInterface.php
+│   └── TwoUserChatFactory.php
+├── Http/
+│   ├── Controllers/
+│   │   ├── AppointmentController.php
+│   │   └── ChatController.php
+│   └── Requests/
+│       └── StoreAppointmentRequest.php
+├── Models/
+│   ├── Appointment.php
+│   ├── Chat.php
+│   └── Message.php
+├── Repositories/
+│   ├── AppointmentRepositoryInterface.php
+│   └── EloquentAppointmentRepository.php
+├── Services/
+│   └── AppointmentService.php
+└── Providers/
+    └── AppServiceProvider.php
+```
+
+---
+
+## ✅ Beneficios Obtenidos
+
+**Módulo de Citas:**
+- Controladores delgados (<100 líneas)
+- Fácil cambio de ORM sin modificar servicios
+- Validaciones reutilizables
+
+**Módulo de Chat:**
+- Creación flexible de diferentes tipos de chat
+- Operaciones complejas encapsuladas en comandos
+- Código más testeable
+
+---
+
+## 🚀 Posibles Proximos Pasos
+
+1. Implementar **Observer Pattern** para notificaciones
+2. Crear **Decorators** para enriquecer mensajes
+3. Desarrollar **Strategy Pattern** para diferentes tipos de citas
+4. Implementar **CQRS** para operaciones complejas
+
+---
+
+## 📚 Conclusión
+
+Esta refactorización demuestra cómo:
+1. **SOLID** mejora el diseño de componentes críticos
+2. Los **Patrones de Diseño** resuelven problemas comunes
+3. La **separación de responsabilidades** facilita el mantenimiento
+
+El código resultante es más flexible, escalable y preparado para nuevos requerimientos.
+```

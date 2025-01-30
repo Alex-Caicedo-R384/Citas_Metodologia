@@ -185,4 +185,3 @@ Esta refactorización demuestra cómo:
 3. La **separación de responsabilidades** facilita el mantenimiento
 
 El código resultante es más flexible, escalable y preparado para nuevos requerimientos.
-```

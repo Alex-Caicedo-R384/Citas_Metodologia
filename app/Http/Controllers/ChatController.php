@@ -6,27 +6,23 @@ use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Commands\SendMessageCommand;
+use App\Factories\ChatFactoryInterface;
+
 
 class ChatController extends Controller
 {
+    protected $chatFactory;
+
+    public function __construct(ChatFactoryInterface $chatFactory)
+    {
+        $this->chatFactory = $chatFactory;
+    }
+
     public function createChat($userId)
     {
-        // Verificar si ya existe un chat entre los usuarios
-        $chat = Chat::where(function($query) use ($userId) {
-            $query->where('user_id_1', Auth::id())
-                  ->where('user_id_2', $userId);
-        })->orWhere(function($query) use ($userId) {
-            $query->where('user_id_1', $userId)
-                  ->where('user_id_2', Auth::id());
-        })->first();
-
-        // Si no existe, crea un nuevo chat
-        if (!$chat) {
-            $chat = Chat::create([
-                'user_id_1' => Auth::id(),
-                'user_id_2' => $userId,
-            ]);
-        }
+        // Usar la fábrica para crear un chat
+        $chat = $this->chatFactory->createChat($userId);
 
         return redirect()->route('chat.show', $chat->id);
     }
@@ -49,15 +45,9 @@ class ChatController extends Controller
             'message' => 'required|string|max:255',
         ]);
 
-        // Encontrar el chat por ID
-        $chat = Chat::findOrFail($chatId);
-
-        // Crear un nuevo mensaje
-        $message = Message::create([
-            'chat_id' => $chatId,
-            'user_id' => Auth::id(),
-            'content' => $request->message,
-        ]);
+        // Crear y ejecutar el comando para enviar el mensaje
+        $command = new SendMessageCommand($chatId, $request->message);
+        $command->execute();
 
         return back();
     }

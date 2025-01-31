@@ -2,27 +2,36 @@
 
 namespace App\Repositories;
 
-use App\Contracts\ProfileCreatable;
-use App\Contracts\ProfileUpdatable;
-use App\Contracts\ProfileDeletable;
 use App\Models\Profile;
 
-class ProfileRepository implements ProfileCreatable, ProfileUpdatable, ProfileDeletable
+class ProfileRepository
 {
-    public function createProfile(array $data)
+    public function createProfile($validatedData, $userId)
     {
-        return Profile::create($data);
-    }
-
-    public function updateProfile(int $id, array $data)
-    {
-        $profile = Profile::findOrFail($id);
-        $profile->update($data);
+        $profile = new Profile($validatedData);
+        $profile->user_id = $userId;
+        $profile->save();
         return $profile;
     }
 
-    public function deleteProfile(int $id)
+    public function updateProfile($validatedData, $user)
     {
-        return Profile::destroy($id);
+        $user->update([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+        ]);
+
+        return $user->profile->update([
+            'birth_date' => $validatedData['birth_date'],
+            'gender' => $validatedData['gender'],
+            'location' => $validatedData['location'],
+            'bio' => $validatedData['bio'],
+        ]);
+    }
+
+    public function deleteProfile($user)
+    {
+        $user->profile()->delete();
+        $user->delete();
     }
 }

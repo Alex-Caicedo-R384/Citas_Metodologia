@@ -4,7 +4,6 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ChatController;
 
 
@@ -37,11 +36,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])
     ->name('appointments.destroy')
     ->middleware('auth');
-
 
 
 require __DIR__.'/auth.php';

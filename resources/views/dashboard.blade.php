@@ -7,7 +7,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Notificaciones de citas -->
             <div class="mb-6">
                 <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">{{ __('Your Appointments') }}</h3>
                 @if($appointments->isNotEmpty())
@@ -32,7 +31,6 @@
                 @endif
             </div>
 
-            <!-- Filtros y usuarios -->
             <div class="mb-6">
                 <form method="GET" action="{{ route('dashboard') }}" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">{{ __('Filter Users') }}</h3>
@@ -68,7 +66,7 @@
                             <h4 class="font-semibold text-lg text-gray-900 dark:text-gray-100">{{ $user->name }}</h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ $user->profile->location ?? __('Location not available') }}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Age') }}: {{ $user->age ?? __('N/A') }}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-300">{{ Str::limit($user->profile->bio, 100) }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-300">{{ Str::limit($user->profile->bio, 300) }}</p>
 
                             <form method="POST" action="{{ route('appointments.store') }}" class="mt-4">
                                 @csrf
@@ -77,7 +75,6 @@
                                 <x-primary-button class="bg-green-600 mt-2">{{ __('Schedule Appointment') }}</x-primary-button>
                             </form>
 
-                            <!-- Formulario para abrir un chat con el usuario -->
                             <form method="GET" action="{{ route('chat.create', $user->id) }}">
                                 @csrf
                                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md mt-4">Open Chat</button>

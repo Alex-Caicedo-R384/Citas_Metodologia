@@ -19,10 +19,8 @@ class SendMessageCommand
 
     public function execute()
     {
-        // Encontrar el chat por ID
         $chat = Chat::findOrFail($this->chatId);
 
-        // Crear un nuevo mensaje
         return Message::create([
             'chat_id' => $this->chatId,
             'user_id' => Auth::id(),

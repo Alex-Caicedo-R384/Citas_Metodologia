@@ -17,9 +17,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChatFactoryInterface::class, TwoUserChatFactory::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         //

@@ -47,6 +47,16 @@
                         <p class="text-gray-700 dark:text-gray-300 mt-1">{{ $user->profile->bio }}</p>
                     </div>
 
+                    <!-- Mostrar álbumes -->
+                    <div class="mb-4">
+                        <x-input-label for="albums" :value="__('Albums')" />
+                        <ul class="list-disc text-gray-700 dark:text-gray-300 ml-5">
+                            @foreach($albums as $album)
+                                <li>{{ $album['title'] }} - {{ $album['artist'] }} ({{ $album['year'] }})</li>
+                            @endforeach
+                        </ul>
+                    </div>
+
                     <div class="flex items-center justify-between mt-6">
                         <a href="{{ route('profile.edit') }}" class="inline-block bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition transform hover:bg-blue-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                             {{ __('Edit Profile') }}

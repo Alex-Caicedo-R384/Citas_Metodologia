@@ -6,15 +6,17 @@ use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ProfileService;
-
+use GuzzleHttp\Client;
 
 class ProfileController extends Controller
 {
     protected $profileService;
+    protected $client;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(ProfileService $profileService, Client $client)
     {
         $this->profileService = $profileService;
+        $this->client = $client;
     }
 
     public function create()
@@ -24,8 +26,14 @@ class ProfileController extends Controller
 
     public function show(Request $request)
     {
+        $user = $request->user();
+
+        // Consumiendo la API de Node.js para obtener los álbumes del usuario
+        $albums = $this->getAlbums();
+
         return view('profile.show', [
-            'user' => $request->user(),
+            'user' => $user,
+            'albums' => $albums,  // Pasamos los álbumes a la vista
         ]);
     }
 
@@ -65,12 +73,22 @@ class ProfileController extends Controller
         return redirect()->route('profile.show')->with('status', 'Profile updated successfully!');
     }
 
-
     public function destroy(Request $request)
     {
-        $this->profileService->deleteProfile($request->user()); // Usar el servicio para eliminar el perfil
+        $this->profileService->deleteProfile($request->user());
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    public function getAlbums()
+    {
+        try {
+            $response = $this->client->request('GET', 'http://localhost:3000/albums');
+            $albums = json_decode($response->getBody()->getContents(), true);
+            return $albums;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }
